@@ -23,21 +23,23 @@ public class IssuesController : Controller
     }
 
     [HttpPost]
+    [ValidateAntiForgeryToken]
     [RequestSizeLimit(20_000_000)] // 20 MB total
-    public async Task<IActionResult> Create(IssueInput input, List<IFormFile> files)
+    public async Task<IActionResult> Create(IssueInput input, IFormFileCollection? files)
     {
         ViewBag.Categories = GetCategories();
         if (!ModelState.IsValid) return View(input);
 
         var allowed = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-    { ".jpg", ".jpeg", ".png", ".gif", ".pdf", ".doc", ".docx", ".heic" };
+        { ".jpg", ".jpeg", ".png", ".gif", ".pdf", ".doc", ".docx", ".heic" };
 
-        const long maxEach = 10_000_000; // 10 MB per file (defensive)
-        const long maxTotal = 20_000_000; // 20 MB per request
+        const long maxEach = 10_000_000; // 10 MB per file
+        const long maxTotal = 20_000_000; // 20 MB total
         long total = 0;
 
-        // Validate files before saving
-        foreach (var f in files ?? Enumerable.Empty<IFormFile>())
+        var incoming = files ?? Request.Form.Files;
+
+        foreach (var f in incoming)
         {
             if (f.Length <= 0) continue;
             var ext = Path.GetExtension(f.FileName);
@@ -65,7 +67,7 @@ public class IssuesController : Controller
             today.ToString("yyyy"), today.ToString("MM"), today.ToString("dd"));
         Directory.CreateDirectory(folder);
 
-        foreach (var f in files ?? Enumerable.Empty<IFormFile>())
+        foreach (var f in incoming)
         {
             if (f.Length <= 0) continue;
             var safeName = Path.GetFileName(f.FileName);
@@ -88,6 +90,7 @@ public class IssuesController : Controller
         TempData["Success"] = "Thank you! Your report was submitted.";
         return RedirectToAction(nameof(Thanks), new { id = report.Id });
     }
+
 
 
     [HttpGet]
