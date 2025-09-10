@@ -1,0 +1,33 @@
+﻿@model MunicipalityApp.Models.IssueReport
+@{
+    ViewData["Title"] = "Report Submitted";
+}
+
+@if (TempData["Success"] is string ok)
+{
+    <div class="alert alert-success">@ok</div>
+}
+
+<h1 class="mb-1">Thank you for your report</h1>
+<p class="text-muted">Your reference number is <strong>@Model.Id</strong>.</p>
+
+<div class="card p-3 mb-3">
+    <div><strong>Location:</strong> @Model.Location</div>
+    <div><strong>Category:</strong> @Model.Category</div>
+    <div><strong>Submitted:</strong> @Model.CreatedAt.ToLocalTime()</div>
+    <div><strong>Status:</strong> @Model.Status</div>
+</div>
+
+@if (Model.Attachments.Count > 0)
+{
+    <h5>Attachments</h5>
+    <ul>
+        @foreach (var a in Model.Attachments)
+        {
+            <li><a href="@a.StoredPath" target="_blank">@a.FileName</a> (@(Math.Round(a.SizeBytes / 1024.0, 1)) KB)</li>
+        }
+    </ul>
+}
+
+<a class="btn btn-primary" asp-controller="Issues" asp-action="Create">Report another issue</a>
+<a class="btn btn-outline-secondary" asp-controller="Home" asp-action="Index">Back to Main Menu</a>

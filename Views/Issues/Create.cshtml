@@ -1,0 +1,93 @@
+﻿@model MunicipalityApp.Models.IssueInput
+@{
+    ViewData["Title"] = "Report an Issue";
+    var categories = (IEnumerable<string>)ViewBag.Categories;
+}
+
+<h1 class="mb-1">Report an Issue</h1>
+<p class="text-muted mb-4">Provide details and attach any evidence to help the municipality respond.</p>
+
+@if (TempData["Error"] is string err)
+{
+    <div class="alert alert-danger">@err</div>
+}
+
+<div class="mb-3">
+    <div class="progress" style="height: 10px;">
+        <div id="progressBar" class="progress-bar" role="progressbar" style="width: 0%"></div>
+    </div>
+    <small id="progressText" class="text-muted">Step 1 of 3: Enter details</small>
+</div>
+
+<form asp-action="Create" method="post" enctype="multipart/form-data" id="issueForm">
+    <div class="mb-3">
+        <label asp-for="Location" class="form-label">Location</label>
+        <input asp-for="Location" class="form-control" placeholder="e.g., 12 Market St, Ward 4" />
+        <span asp-validation-for="Location" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Category" class="form-label">Category</label>
+        <select asp-for="Category" class="form-select">
+            <option value="">-- Select a category --</option>
+            @foreach (var c in categories)
+            {
+                <option value="@c">@c</option>
+            }
+        </select>
+        <span asp-validation-for="Category" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label">Description</label>
+        <textarea asp-for="Description" rows="5" class="form-control"
+                  placeholder="Describe the issue with helpful details (landmarks, severity, timing)…"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Attachments (images/documents)</label>
+        <input type="file" name="files" multiple class="form-control"
+               accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.heic" />
+        <div class="form-text">Up to 20 MB total. JPG/JPENG/PNG/GIF/PDF/DOC/DOCX/HEIC recommended.</div>
+    </div>
+
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary">Submit Report</button>
+        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">Back to Main Menu</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Engagement: progress bar + encouraging messages
+        const form = document.getElementById('issueForm');
+        const fields = ['Location','Category','Description'];
+        const bar = document.getElementById('progressBar');
+        const text = document.getElementById('progressText');
+
+        function score(){
+            let s=0;
+            for (const f of fields){
+                const el = document.querySelector(`[name='${f}']`);
+                if(!el) continue;
+                if (f === 'Description' && (el.value?.trim().length ?? 0) >= 10) s++;
+                else if (el.value && el.value.trim().length > 0) s++;
+            }
+            return s;
+        }
+        function update(){
+            const s = score(); // 0..3
+            const pct = Math.round((s/3)*100);
+            bar.style.width = pct + '%';
+            let msg = 'Step 1 of 3: Enter details';
+            if (s === 1) msg = 'Nice start! Step 2: Choose a category';
+            if (s === 2) msg = 'Almost there! Step 3: Add a clear description';
+            if (s === 3) msg = 'Great! You can submit your report now ✅';
+            text.textContent = msg;
+        }
+        form.addEventListener('input', update);
+        update();
+    </script>
+}

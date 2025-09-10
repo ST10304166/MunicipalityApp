@@ -1,0 +1,46 @@
+﻿@{
+    ViewData["Title"] = "Main Menu";
+}
+
+<div class="mb-4">
+    <h1 class="mb-1">Municipality Services</h1>
+    <p class="text-muted">Choose a task to continue.</p>
+</div>
+
+<div class="card-grid">
+    <!-- Report Issues (enabled) -->
+    <div class="task-card">
+        <div>
+            <span class="badge-coming">Active</span>
+            <h3 class="mt-2">Report Issues</h3>
+            <p>Log problems like potholes, water leaks, refuse collection, or outages.</p>
+        </div>
+        <div>
+            <a class="btn btn-primary w-100" asp-controller="Issues" asp-action="Create">Open</a>
+        </div>
+    </div>
+
+    <!-- Local Events & Announcements (disabled) -->
+    <div class="task-card">
+        <div>
+            <span class="badge-coming">Coming soon</span>
+            <h3 class="mt-2">Local Events & Announcements</h3>
+            <p>Browse upcoming local events and important community notices.</p>
+        </div>
+        <div>
+            <button class="btn btn-disabled w-100" title="This feature will be implemented later">Disabled</button>
+        </div>
+    </div>
+
+    <!-- Service Request Status (disabled) -->
+    <div class="task-card">
+        <div>
+            <span class="badge-coming">Coming soon</span>
+            <h3 class="mt-2">Service Request Status</h3>
+            <p>Track progress of previously submitted requests with unique IDs.</p>
+        </div>
+        <div>
+            <button class="btn btn-disabled w-100" title="This feature will be implemented later">Disabled</button>
+        </div>
+    </div>
+</div>
